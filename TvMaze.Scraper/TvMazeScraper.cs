@@ -1,21 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
 using TvMaze.ApiClient;
+using TvMaze.Data;
 
 namespace TvMaze.Scraper
 {
     public class TvMazeScraper
     {
         private readonly TvMazeApiClient _apiClient;
+        private readonly TvMazeRepository _tvMazeRepository;
         private readonly ILogger<TvMazeScraper> _logger;
 
-        public TvMazeScraper(TvMazeApiClient apiClient, ILogger<TvMazeScraper> logger)
+        public TvMazeScraper(
+            TvMazeApiClient apiClient,
+            TvMazeRepository tvMazeRepository,
+            ILogger<TvMazeScraper> logger
+        )
         {
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
+            _tvMazeRepository = tvMazeRepository ?? throw new ArgumentNullException(nameof(tvMazeRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -70,6 +79,8 @@ namespace TvMaze.Scraper
                     {
                         List<CastEntry> cast = await _apiClient.GetCastAsync(showId);
                         _logger.LogInformation("Retrieved the cast for show {0}", showId);
+
+                        await SaveShow(showHeader, cast);
                     }
                     catch (Exception exception)
                     {
@@ -89,6 +100,33 @@ namespace TvMaze.Scraper
             {
                 _logger.LogError(exception, "Error when getting page {0} from the API", page);
                 return IngestionResult.Failure;
+            }
+        }
+
+        private async Task SaveShow(ShowHeader showHeader, List<CastEntry> cast)
+        {
+            try
+            {
+                // TODO is it intended to de-dupe this if an actor has several roles?
+                List<Cast> castDbos = cast.Select(it => new Cast
+                {
+                    TvMazeId = it.Person.Id,
+                    Name = it.Person.Name,
+                    Birthday = it.Person.Birthday
+                }).ToList();
+
+                var showDbo = new Show
+                {
+                    TvMazeId = showHeader.Id,
+                    Name = showHeader.Name,
+                    Cast = castDbos
+                };
+
+                await _tvMazeRepository.PutShow(showDbo);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Cannot save show {0} into the database", showHeader.Id);
             }
         }
     }

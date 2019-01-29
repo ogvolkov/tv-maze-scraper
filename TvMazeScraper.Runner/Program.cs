@@ -1,8 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TvMaze.ApiClient;
+using TvMaze.Data;
 
 namespace TvMaze.Scraper.Runner
 {
@@ -10,8 +12,12 @@ namespace TvMaze.Scraper.Runner
     {
         public static async Task Main(string[] args)
         {
+            var builder = new ConfigurationBuilder();
+            builder.AddEnvironmentVariables();
+            IConfigurationRoot configuration = builder.Build();
+
             var services = new ServiceCollection();
-            ConfigureServices(services);
+            ConfigureServices(services, configuration);
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             var scraper = serviceProvider.GetRequiredService<TvMazeScraper>();
@@ -21,12 +27,18 @@ namespace TvMaze.Scraper.Runner
             serviceProvider.Dispose();
         }
 
-        private static void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<TvMazeScraper>();
+            services.AddTransient<TvMazeScraper>();
 
-            services.AddSingleton<TvMazeApiClient>();
+            services.AddTransient<TvMazeRepository>();
+
+            services.AddTransient<TvMazeApiClient>();
             services.AddHttpClient<TvMazeApiClient>();
+
+            services.AddDbContext<TvMazeContext>(options => 
+                options.UseSqlServer(configuration.GetConnectionString("TvMaze"))
+            );
 
             services.AddLogging(builder => builder.AddConsole());
         }

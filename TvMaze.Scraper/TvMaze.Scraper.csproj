@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TvMaze.ApiClient\TvMaze.ApiClient.csproj" />
+    <ProjectReference Include="..\TvMaze.Data\TvMaze.Data.csproj" />
   </ItemGroup>
 
 </Project>
