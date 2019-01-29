@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,8 +21,11 @@ namespace TvMaze.ApiClient.Integration.Tests
         [Test]
         public async Task GetShowsRetrievesFirstPage()
         {
+            // arrange 
+            int page = 0;
+
             // act
-            List<ShowHeader> shows = await _tvMazeApiClient.GetShows(0);
+            List<ShowHeader> shows = await _tvMazeApiClient.GetShowsAsync(page);
 
             // assert
             Assert.That(shows, Is.Not.Null);
@@ -44,10 +48,34 @@ namespace TvMaze.ApiClient.Integration.Tests
 
             // act + assert
             UnsuccessfulStatusCodeException exception = Assert.ThrowsAsync<UnsuccessfulStatusCodeException>(
-                async () => await _tvMazeApiClient.GetShows(unreachablePage)
+                async () => await _tvMazeApiClient.GetShowsAsync(unreachablePage)
             );
         
             Assert.That(exception.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        }
+
+        [Test]
+        public async Task GetsShowCast()
+        {
+            // arrange
+            int showId = 1;
+
+            // act
+            List<CastEntry> cast = await _tvMazeApiClient.GetCastAsync(showId);
+
+            // assert
+            Assert.That(cast, Is.Not.Null);
+            Assert.That(cast.Count, Is.GreaterThan(1));
+
+            Assert.That(cast[0].Person, Is.Not.Null);
+            Assert.That(cast[0].Person.Id, Is.EqualTo(1));
+            Assert.That(cast[0].Person.Name, Is.EqualTo("Mike Vogel"));
+            Assert.That(cast[0].Person.Birthday, Is.EqualTo(new DateTime(1979, 07, 17)));
+
+            Assert.That(cast[1].Person, Is.Not.Null);
+            Assert.That(cast[1].Person.Id, Is.EqualTo(2));
+            Assert.That(cast[1].Person.Name, Is.EqualTo("Rachelle Lefevre"));
+            Assert.That(cast[1].Person.Birthday, Is.EqualTo(new DateTime(1979, 02, 01)));
         }
     }
 }

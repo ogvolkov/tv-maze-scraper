@@ -19,9 +19,19 @@ namespace TvMaze.ApiClient
             _httpClient.BaseAddress = new Uri(BASE_URL);
         }
 
-        public async Task<List<ShowHeader>> GetShows(int page)
+        public Task<List<ShowHeader>> GetShowsAsync(int page)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync($"/shows?page={page}");
+            return GetJsonAsync<List<ShowHeader>>($"/shows?page={page}");
+        }
+
+        public Task<List<CastEntry>> GetCastAsync(int showId)
+        {
+            return GetJsonAsync<List<CastEntry>>($"/shows/{showId}/cast");
+        }
+
+        private async Task<T> GetJsonAsync<T>(string url)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -30,7 +40,7 @@ namespace TvMaze.ApiClient
 
             string content = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<List<ShowHeader>>(content);
+            return JsonConvert.DeserializeObject<T>(content);
         }
     }
 }
