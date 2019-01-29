@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -35,7 +36,14 @@ namespace TvMaze.ApiClient
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new UnsuccessfulStatusCodeException(response.StatusCode);
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.NotFound:
+                        throw new NotFoundException();
+                    // TODO 429
+                    default:
+                        throw new ApiErrorException(response.StatusCode);
+                }
             }
 
             string content = await response.Content.ReadAsStringAsync();

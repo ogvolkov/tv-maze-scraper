@@ -23,7 +23,21 @@ namespace TvMaze.Scraper.Runner
 
         private static async Task RunAsync(TvMazeScraper scraper)
         {
-            await scraper.IngestBatch(0);
+            // TODO start from the last processed page
+
+            for (int page = 0; ; page++)
+            {
+                IngestionResult result = await scraper.IngestBatch(page);
+
+                switch (result)
+                {
+                    case IngestionResult.Success:
+                        break;
+                    case IngestionResult.NothingToProcess:
+                        // it's the last batch, finish
+                        return;
+                }
+            }
         }
 
         private static void ConfigureServices(IServiceCollection services)

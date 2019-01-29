@@ -19,10 +19,22 @@ namespace TvMaze.Scraper
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task IngestBatch(int page)
+        public async Task<IngestionResult> IngestBatch(int page)
         {
-            List<ShowHeader> showsBatch = await _apiClient.GetShowsAsync(page);
+            List<ShowHeader> showsBatch;
+            try
+            {
+                showsBatch = await _apiClient.GetShowsAsync(page);
+            }
+            catch (NotFoundException)
+            {
+                _logger.LogInformation("Shows for page not found {0}", page);
+                return IngestionResult.NothingToProcess;
+            }
+
             _logger.LogInformation("Received page {0} from the API, got {1} show(s)", page, showsBatch.Count);
+
+            return IngestionResult.Success;
         }
     }
 }

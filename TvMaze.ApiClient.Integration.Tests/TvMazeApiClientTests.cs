@@ -41,17 +41,15 @@ namespace TvMaze.ApiClient.Integration.Tests
         }
 
         [Test]
-        public void GetShowsRetrieves404ForPagesFarAway()
+        public void GetShowsThrowsNotFoundExceptionForPagesFarAway()
         {
             // arrange
             int unreachablePage = 99999;
 
             // act + assert
-            UnsuccessfulStatusCodeException exception = Assert.ThrowsAsync<UnsuccessfulStatusCodeException>(
+            Assert.ThrowsAsync<NotFoundException>(
                 async () => await _tvMazeApiClient.GetShowsAsync(unreachablePage)
             );
-        
-            Assert.That(exception.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         [Test]
