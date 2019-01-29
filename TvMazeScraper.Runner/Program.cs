@@ -16,28 +16,9 @@ namespace TvMaze.Scraper.Runner
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             var scraper = serviceProvider.GetRequiredService<TvMazeScraper>();
 
-            await RunAsync(scraper);
+            await scraper.RunAsync();
 
             serviceProvider.Dispose();
-        }
-
-        private static async Task RunAsync(TvMazeScraper scraper)
-        {
-            // TODO start from the last processed page
-
-            for (int page = 0; ; page++)
-            {
-                IngestionResult result = await scraper.IngestBatch(page);
-
-                switch (result)
-                {
-                    case IngestionResult.Success:
-                        break;
-                    case IngestionResult.NothingToProcess:
-                        // it's the last batch, finish
-                        return;
-                }
-            }
         }
 
         private static void ConfigureServices(IServiceCollection services)
