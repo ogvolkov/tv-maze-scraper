@@ -35,6 +35,8 @@ namespace TvMaze.Scraper.Runner
 
             services.AddTransient<TvMazeApiClient>();
 
+            // TODO: investigate if it blocks the whole HttpClient instance
+            // TODO: investigate console app responsiveness when waiting
             services.AddHttpClient<TvMazeApiClient>()
                 .AddPolicyHandler(RetryPolicyProvider.Get());
 

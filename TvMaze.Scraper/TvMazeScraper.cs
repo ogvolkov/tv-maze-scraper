@@ -66,8 +66,7 @@ namespace TvMaze.Scraper
                 List<ShowHeader> showsBatch = await _apiClient.GetShowsAsync(page);
                 _logger.LogInformation("Received page {0} from the API, got {1} show(s)", page, showsBatch.Count);
 
-
-                // do a stupid sequential loop for now to test the other parts
+                // given the TV Maze rate limits, it doesn't make much sense to send requests in parallel, as they get limited pretty soon
                 foreach (ShowHeader showHeader in showsBatch)
                 {
                     int showId = showHeader.Id;

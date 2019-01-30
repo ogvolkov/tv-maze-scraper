@@ -9,9 +9,9 @@ namespace TvMaze.Scraper
     {
         private const int RETRY_COUNT = 5;
 
-        private const int INITIAL_DELAY_IN_SECONDS = 2;
+        private const float INITIAL_DELAY_IN_SECONDS = 1.5f;
 
-        private const int JITTER_IN_MILLISECONDS = 1000;
+        private const int JITTER_IN_MILLISECONDS = 500;
 
         private static readonly Random _jitterer = new Random();
 
