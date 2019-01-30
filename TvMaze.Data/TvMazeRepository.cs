@@ -23,14 +23,35 @@ namespace TvMaze.Data
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyCollection<Show>> GetShowsWithCast(int skip, int take)
+        public async Task<IReadOnlyCollection<ShowWithOrderedCast>> GetShowsWithCast(int skip, int take)
         {
-            // TODO order children. Too bad EF can't do it directly
-            return await _dbContext.Shows
+            // construct a join instead of _dbContext.Shows.Include(it => it.Cast) because apparently,
+            // ordering children on the database level is not that straightforward in EF
+            var shows = _dbContext.Shows
                 .OrderBy(it => it.Id)
                 .Skip(skip)
-                .Take(take)
-                .Include(it => it.Cast)
+                .Take(take);
+
+            var showsWithCast =
+                from show in shows
+                join cast in _dbContext.Cast
+                    on show equals cast.Show
+                select new { show, cast };
+
+            return await
+                showsWithCast
+                .OrderBy(it => it.show)
+                // NOTE: some cast members have no birth date. assume nulls last is ok
+                .ThenByDescending(it => it.cast.Birthday)
+                .GroupBy(it => it.show)
+                .Select(group =>
+                    new ShowWithOrderedCast
+                    {
+                        Id = group.Key.Id,
+                        TvMazeId = group.Key.TvMazeId,
+                        Name = group.Key.Name,
+                        Cast = group.Select(it => it.cast).ToList()
+                    })
                 .ToListAsync();
         }
     }

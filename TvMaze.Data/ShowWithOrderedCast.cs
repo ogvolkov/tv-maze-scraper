@@ -1,17 +1,15 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace TvMaze.Data
 {
-    public class Cast
+    public class ShowWithOrderedCast
     {
         public int Id { get; set; }
 
         public int TvMazeId { get; set; }
 
-        public Show Show { get; set; }
-
         public string Name { get; set; }
 
-        public DateTime? Birthday { get; set; }
+        public List<Cast> Cast { get; set; }
     }
 }

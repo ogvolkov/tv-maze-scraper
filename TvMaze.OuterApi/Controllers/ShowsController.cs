@@ -27,12 +27,12 @@ namespace TvMaze.OuterApi.Controllers
             int pageNumber = page ?? 1;
             int skip = (pageNumber - 1) * PAGE_SIZE;
 
-            IReadOnlyCollection<Show> shows = await _repository.GetShowsWithCast(skip, PAGE_SIZE);
+            var shows = await _repository.GetShowsWithCast(skip, PAGE_SIZE);
 
             return shows.Select(ConvertShow).ToList();
         }
 
-        private ShowModel ConvertShow(Show show)
+        private ShowModel ConvertShow(ShowWithOrderedCast show)
         {
             // NOTE: assume the consumer is interested in the original TvMaze ids
             // at least, that would be easier for debugging
