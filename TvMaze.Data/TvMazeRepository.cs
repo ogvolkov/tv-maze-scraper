@@ -1,6 +1,9 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace TvMaze.Data
 {
@@ -18,6 +21,17 @@ namespace TvMaze.Data
             // perhaps it would make sense to perform an idempotent create or update later
             _dbContext.Shows.Add(show);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<Show>> GetShowsWithCast(int skip, int take)
+        {
+            // TODO order children. Too bad EF can't do it directly
+            return await _dbContext.Shows
+                .OrderBy(it => it.Id)
+                .Skip(skip)
+                .Take(take)
+                .Include(it => it.Cast)
+                .ToListAsync();
         }
     }
 }
