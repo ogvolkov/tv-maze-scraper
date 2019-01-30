@@ -70,9 +70,6 @@ namespace TvMaze.Scraper
                 // do a stupid sequential loop for now to test the other parts
                 foreach (ShowHeader showHeader in showsBatch)
                 {
-                    // TODO deal with rate limiting later
-                    await Task.Delay(300);
-
                     int showId = showHeader.Id;
 
                     try

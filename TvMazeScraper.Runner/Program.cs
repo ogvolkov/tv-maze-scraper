@@ -34,9 +34,11 @@ namespace TvMaze.Scraper.Runner
             services.AddTransient<TvMazeRepository>();
 
             services.AddTransient<TvMazeApiClient>();
-            services.AddHttpClient<TvMazeApiClient>();
 
-            services.AddDbContext<TvMazeContext>(options => 
+            services.AddHttpClient<TvMazeApiClient>()
+                .AddPolicyHandler(RetryPolicyProvider.Get());
+
+            services.AddDbContext<TvMazeContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("TvMaze"))
             );
 

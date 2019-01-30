@@ -40,7 +40,6 @@ namespace TvMaze.ApiClient
                 {
                     case HttpStatusCode.NotFound:
                         throw new NotFoundException();
-                    // TODO 429
                     default:
                         throw new ApiErrorException(response.StatusCode);
                 }
