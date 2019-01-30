@@ -5,6 +5,13 @@ Create an application that:
 
 The url format would be /api/shows?page={page}, starting from page 1.
 
+Environment:
+* .NET Core 2.2.
+* Sql Server for storage.
+* Scraper is a console app.
+* API is an ASP.NET Core app.
+* Connection string TVMaze is retrieved from the environment variables.
+
 API decisions:
 * When there are no more shows for the page, return an empty collection.
 * Assume the ids returned are the ones TVMaze uses, not our internal ones.
