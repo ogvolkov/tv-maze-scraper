@@ -21,17 +21,17 @@ API decisions:
 * Page size is 10 for simplicity.
 
 Scraper decisions:
-* Save only the data which is explicitly required to display (for simplicity)..
+* Save only the data which is explicitly required to display (for simplicity).
 * Data retrieval is essentially sequential, as TVMaze rate limiting seems to make the parallelization not very beneficial.
-* If an actor plays several roles in a show, save only the single physical.
+* If an actor plays several roles in a show, save only the single physical person.
 * Show to actor is one to many. Oops, that's a blunder - didn't realize person.id applies to all appearances of an actor. Should have been many to many.
 
 Leftovers:
 * Save progress when scraping and continue where we left off.
 * File-based logs for the scraper.
 * Test for scraper's error handling.
-* Validate input page in the API.
+* Validate input page parameter in the API.
 * Investigate if extra database indices are needed.
 * Investigate the best retry and concurrency settings.
 
-Fun fact: TV Maze itself is not fully de-duped, there seems to be actor duplicates e.g. in http://api.tvmaze.com/shows/7692/cast.
+Fun fact: TV Maze itself is not fully de-duped, there seem to be actor duplicates, as in http://api.tvmaze.com/shows/7692/cast.
