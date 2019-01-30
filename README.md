@@ -33,3 +33,5 @@ Leftovers:
 * Validate input page in the API.
 * Investigate if extra database indices are needed.
 * Investigate the best retry and concurrency settings.
+
+Fun fact: TV Maze itself is not fully de-duped, there seems to be actor duplicates e.g. in http://api.tvmaze.com/shows/7692/cast.
