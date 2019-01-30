@@ -23,7 +23,7 @@ namespace TvMaze.Data
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<Show>> GetShowsWithCast(int skip, int take)
+        public async Task<IReadOnlyCollection<Show>> GetShowsWithCast(int skip, int take)
         {
             // TODO order children. Too bad EF can't do it directly
             return await _dbContext.Shows
