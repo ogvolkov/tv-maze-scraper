@@ -11,6 +11,8 @@ namespace TvMaze.ApiClient
 
         public DateTime? Birthday { get; }
 
+        // and so on if we need to store more data than required by the task
+
         public Person(int id, string name, DateTime? birthday)
         {
             Id = id;

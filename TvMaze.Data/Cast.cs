@@ -13,5 +13,7 @@ namespace TvMaze.Data
         public string Name { get; set; }
 
         public DateTime? Birthday { get; set; }
+
+        // and so on if we need to store more data than required by the task
     }
 }

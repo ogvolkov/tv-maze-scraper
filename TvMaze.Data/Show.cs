@@ -11,5 +11,7 @@ namespace TvMaze.Data
         public string Name { get; set; }
 
         public List<Cast> Cast { get; set; }
+
+        // and so on if we need to store more data than required by the task
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -76,6 +75,8 @@ namespace TvMaze.Scraper
                         List<CastEntry> cast = await _apiClient.GetCastAsync(showId);
                         _logger.LogInformation("Retrieved the cast for show {0}", showId);
 
+
+
                         await SaveShow(showHeader, cast);
                     }
                     catch (Exception exception)
@@ -103,19 +104,23 @@ namespace TvMaze.Scraper
         {
             try
             {
-                // TODO is it intended to de-dupe this if an actor has several roles?
-                List<Cast> castDbos = cast.Select(it => new Cast
+                IEnumerable<Cast> castDbos = cast.Select(it => new Cast
                 {
                     TvMazeId = it.Person.Id,
                     Name = it.Person.Name,
                     Birthday = it.Person.Birthday
-                }).ToList();
+                });
+
+                // now, an actor can represent several characters in the show
+                // in a full-blown system, we would probably store all the actor: character relationships,
+                // but as now we need only people, store de-duped data for simplicity
+                List<Cast> uniqueCast = castDbos.Distinct(new PersonEqualityComparer()).ToList();
 
                 var showDbo = new Show
                 {
                     TvMazeId = showHeader.Id,
                     Name = showHeader.Name,
-                    Cast = castDbos
+                    Cast = uniqueCast
                 };
 
                 await _tvMazeRepository.PutShow(showDbo);
@@ -123,6 +128,19 @@ namespace TvMaze.Scraper
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Cannot save show {0} into the database", showHeader.Id);
+            }
+        }
+
+        private class PersonEqualityComparer: IEqualityComparer<Cast>
+        {
+            public bool Equals(Cast x, Cast y)
+            {
+                return x.TvMazeId == y.TvMazeId;
+            }
+
+            public int GetHashCode(Cast obj)
+            {
+                return obj.TvMazeId;
             }
         }
     }
